@@ -49,4 +49,4 @@ jobs:
         run: |
           python send_to_n8n.py
         env:
-          N8N_WEBHOOK_URL: https://kinley-nongeologic-evanescently.ngrok-free.dev/webhook/linkedin-jobs
+          N8N_WEBHOOK_URL: https://kinley-nongeologic-evanescently.ngrok-free.dev/webhook-test/linkedin-jobs
