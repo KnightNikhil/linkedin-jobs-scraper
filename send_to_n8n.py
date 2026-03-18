@@ -1,8 +1,8 @@
 """
 send_to_n8n.py
-Reads jobs_output.json and sends all jobs to n8n webhook
+Sends ALL jobs in a single POST request to n8n webhook
 """
-import json, os, requests, sys, time
+import json, os, requests, sys
 
 WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL", "")
 
@@ -23,29 +23,21 @@ if not jobs:
     print("No jobs found — nothing to send")
     sys.exit(0)
 
-print(f"Sending {len(jobs)} jobs to n8n...")
+print(f"Sending {len(jobs)} jobs in one request to n8n...")
 
-success = 0
-failed  = 0
-
-for i, job in enumerate(jobs):
-    try:
-        resp = requests.post(
-            WEBHOOK_URL,
-            json=job,
-            headers={"Content-Type": "application/json"},
-            timeout=30
-        )
-        if resp.status_code == 200:
-            success += 1
-            print(f"  ✅ [{i+1}/{len(jobs)}] {job.get('title','?')} @ {job.get('company','?')}")
-        else:
-            failed += 1
-            print(f"  ❌ [{i+1}/{len(jobs)}] HTTP {resp.status_code} — {job.get('title','?')}")
-    except Exception as e:
-        failed += 1
-        print(f"  ❌ [{i+1}/{len(jobs)}] Error: {e}")
-
-    time.sleep(0.3)
-
-print(f"\nDone! ✅ {success} sent | ❌ {failed} failed")
+# ── Send ALL jobs in a single POST ────────────────────────────
+try:
+    resp = requests.post(
+        WEBHOOK_URL,
+        json={ "jobs": jobs, "count": len(jobs) },
+        headers={"Content-Type": "application/json"},
+        timeout=60
+    )
+    if resp.status_code == 200:
+        print(f"✅ Successfully sent {len(jobs)} jobs to n8n")
+    else:
+        print(f"❌ Failed — HTTP {resp.status_code}: {resp.text[:200]}")
+        sys.exit(1)
+except Exception as e:
+    print(f"❌ Error sending to n8n: {e}")
+    sys.exit(1)
