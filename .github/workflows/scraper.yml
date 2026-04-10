@@ -49,4 +49,4 @@ jobs:
         run: |
           python send_to_n8n.py
         env:
-          N8N_WEBHOOK_URL: https://n8n.nikhilladdha.in/webhook-test/linkedin-jobs
+          N8N_WEBHOOK_URL: https://n8n.nikhilladdha.in/webhook/linkedin-jobs
